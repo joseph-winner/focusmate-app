@@ -1,70 +1,40 @@
-import React, { createContext, useState, useEffect } from 'react';
-import { auth, googleProvider } from './firebase';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { auth, googleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, signInWithPopup, onAuthStateChanged } from "../../utils/Firebase/FirebaseConfig"
 
-// Create a context
 const AuthContext = createContext();
 
-// Create a provider component
+export const useAuth = () => useContext(AuthContext);
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  // Listen to Firebase auth state changes
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      setUser(user);
-      setLoading(false);
-    });
+    const unsubscribe = onAuthStateChanged(auth, setUser);
     return () => unsubscribe();
   }, []);
 
-  // Signup function (email/password)
   const signup = async (email, password) => {
-    try {
-      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-      return userCredential.user;
-    } catch (error) {
-      throw new Error(error.message);
-    }
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
   };
 
-  // Login function (email/password)
   const login = async (email, password) => {
-    try {
-      const userCredential = await auth.signInWithEmailAndPassword(email, password);
-      return userCredential.user;
-    } catch (error) {
-      throw new Error(error.message);
-    }
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    return userCredential.user;
   };
 
-  // Google Login function
-  const googleLogin = async () => {
-    try {
-      const userCredential = await auth.signInWithPopup(googleProvider);
-      return userCredential.user;
-    } catch (error) {
-      throw new Error(error.message);
-    }
+  const loginWithGoogle = async () => {
+    const result = await signInWithPopup(auth, googleAuthProvider);
+    return result.user;
   };
 
-  // Logout function
   const logout = async () => {
-    try {
-      await auth.signOut();
-    } catch (error) {
-      throw new Error(error.message);
-    }
+    await signOut(auth);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signup, login, googleLogin, logout }}>
+    <AuthContext.Provider value={{ user, signup, login, loginWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   );
-};
-
-// Create a custom hook to use the auth context
-export const useAuth = () => {
-  return React.useContext(AuthContext);
 };

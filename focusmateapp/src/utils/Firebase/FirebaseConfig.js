@@ -1,8 +1,11 @@
-// Import the functions you need from the Firebase SDK
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:713182451.
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:3074404924.
+// Suggested code may be subject to a license. Learn more: ~LicenseLog:58815292.
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
-// Firebase configuration from environment variables
+// Your Firebase config object
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: "focusmate-b5480.firebaseapp.com",
@@ -13,13 +16,10 @@ const firebaseConfig = {
   measurementId: "G-64PMPQ1DST"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-// Initialize Firebase Authentication
 const auth = getAuth(app);
+const googleAuthProvider = new GoogleAuthProvider();
+const db = getFirestore(app);
 
-// Set up the Google provider
-const googleProvider = new GoogleAuthProvider();
+export { auth, googleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, signInWithPopup, onAuthStateChanged, db };
 
-export { auth, googleProvider };
